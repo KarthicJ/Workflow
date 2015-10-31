@@ -1,10 +1,37 @@
-Package: Workflow
+Package: BULLSeye
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1
-Date: 2015-11-01
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: A General-Purpose Package for Dynamic Report Generation in R
+Version: 1.11.10
+Date: 2015-08-14
+Authors@R: c(
+    person("Karthic", "J", email = "karthic@ymail.com", role = c("aut", "cre"))
+    )
+Maintainer: Karthic J <karthic@ymail.com>
+Description: Provides a general-purpose tool for dynamic report generation in R
+    using Literate Programming techniques.
+Depends:
+    R (>= 3.0.2)
+Imports:
+    evaluate (>= 0.8),
+    digest,
+    formatR,
+    highr,
+    markdown,
+    stringr (>= 0.6),
+    yaml (>= 2.1.5),
+    methods,
+    tools
+Suggests:
+    testit,
+    rgl (>= 0.95.1201),
+    codetools,
+    rmarkdown,
+    XML,
+    RCurl
+License: GPL
 LazyData: TRUE
+URL: http://karthicj/BULLSeye/
+BugReports: https://github.com/KarthicJ/BULLSeye/issues
+Collate:
+    'sample.R'
+RoxygenNote: 5.0.0
