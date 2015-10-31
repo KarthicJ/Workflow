@@ -1,0 +1,81 @@
+language: c
+
+sudo: false
+
+# environment variables
+env:
+  matrix:
+    - TARGET=travis
+    - TARGET=integration DISPLAY=:99.0
+  global:
+    secure: AwMvWbAlUxA/SNmXpfm3zL7o5ohB2Qp/qyCrYdLRc8u9v6FBQAVq0NXghsN9NVCUiNO+unSr7qXj9JDcRyx6qj67nEzTM3Pcq1iEUAoWQyhDw9gyTls8wya2K4PG86b2yUAtVFkYBYDakjuTdo786Ili+Dsw4XP0PgtnuozCxuY=
+
+# capturing state, early exit if no integration test is needed
+before_install:
+  - export PATH=$HOME/bin:$PATH
+  - echo $HOME
+  - if [ ${TARGET} = integration ]; then
+      if ! make integration-need; then
+        echo "NOTE:"" Integration test skipped.";
+        exit 0;
+      fi;
+    fi
+
+addons:
+  apt:
+    sources:
+    - r-packages-precise
+    packages:
+    - r-base-dev
+    - r-recommended
+    - ghc
+    - highlight
+    - optipng
+    - coffeescript
+    - asymptote
+    - graphviz
+    - scala
+    - qpdf
+    - texinfo
+
+# install dependencies
+install:
+  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
+  #- "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-texlive | bash"
+  #- "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
+  #- "wget -q -O - http://yihui.name/xran/r-config | bash"
+  - Rscript -e "if (!require('devtools')) install.packages('devtools')"
+  - Rscript -e "if (!require('sqldf')) install.packages('sqldf')"
+  - Rscript -e "if (!require('plyr')) install.packages('plyr')"
+  - Rscript -e "if (!require('tcltk2')) install.packages('tcltk2')"
+  - Rscript -e 'devtools::install_deps(dep = TRUE); update.packages(.libPaths()[1], ask = FALSE)'
+  - Rscript -e "if (!require('covr')) install.packages('covr')"
+
+cache:
+  directories:
+  - $HOME/R
+
+# run tests
+script:
+  - make ${TARGET}
+  
+# deploy to xran after integration tests
+after_success:
+  - export R_PKG="$(basename $TRAVIS_REPO_SLUG)"
+  - cat /home/travis/build/KarthicJ/BULLSeye.Rcheck/00check.log
+  - cat /home/travis/build/KarthicJ/BULLSeye.Rcheck/00install.out
+
+after_failure:
+  - cp ${RCHECK_DIR}/00check.log https://github.com/KarthicJ/BULLSeye/R
+  - cat /home/travis/build/KarthicJ/BULLSeye.Rcheck/00check.log
+  - cat /home/travis/build/KarthicJ/BULLSeye.Rcheck/00install.out
+
+ deploy:
+   edge: true
+   provider: cloudfoundry
+   username: karthicspeaks@gmail.com
+   password: K1r20h9c
+   api: https://api.run.pivotal.io
+   organization: BULLSeye
+   space: development
+   
